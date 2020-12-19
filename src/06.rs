@@ -25,8 +25,8 @@ fn part2() {
         .map(|group| {
             group
                 .lines()
-                .map(|line| line.bytes().fold(0, |ans, q| ans | (1 << (q - b'a'))))
-                .fold(std::u32::MAX, |ans, group| ans & group)
+                .map(|line| line.bytes().fold(0, |rec, q| rec | (1 << (q - b'a'))))
+                .fold(std::u32::MAX, |rec, group| rec & group)
                 .count_ones()
         })
         .sum::<u32>();
