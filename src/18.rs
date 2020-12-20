@@ -41,7 +41,6 @@ fn solve_v1(s: &str) -> u64 {
     s.split_whitespace()
         .fold((0, '+'), |(result, operator), s| {
             match (s.chars().next().unwrap(), operator) {
-                (' ', _) => (result, operator),
                 ('+', _) => (result, '+'),
                 ('*', _) => (result, '*'),
                 (_, '+') => (result + s.parse::<u64>().unwrap(), operator),
