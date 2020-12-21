@@ -19,18 +19,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let rule_0 = Regex::new(&format!("^{}$", simplify("0", &mut rules)))?;
     let p1 = messages.lines().filter(|m| rule_0.is_match(&m)).count();
-    println!("Day 19 Part 1: {}", p1);
+    rules.get_mut("0").ok_or("no rule 0")?.1 = String::new();
     let rule_31 = rules.get("31").ok_or("no rule 31")?.1.clone();
     let rule_42 = rules.get("42").ok_or("no rule 42")?.1.clone();
-
-    rules.get_mut("8").ok_or("no rule 8")?.1.push('+');
-    let rule_11 = rules.get_mut("11").ok_or("no rule 11")?;
-    rule_11.1 = format!("(({})+({})*({})+)", rule_42, rule_11.1, rule_31);
-    println!("{}", rules.get("11").unwrap().1);
+    rules.get_mut("8").ok_or("no rule 0")?.1 = format!("{}+", rule_42);
+    rules.get_mut("11").ok_or("no rule 0")?.1 = format!("{}+(?P<thirtyone>{}+)", rule_42, rule_31);
 
     let rule_0 = Regex::new(&format!("^{}$", simplify("0", &mut rules)))?;
-    let p2 = messages.lines().filter(|m| rule_0.is_match(&m)).count();
-    println!("Day 19 Part 2: {}", p2);
+    let p2 = messages
+        .lines()
+        .filter(|m| {
+            rule_0
+                .captures(&m)
+                .and_then(|c| c.name("thirtyone"))
+                .map_or(0, |x| x.start())
+                << 1
+                > m.len() // 42 must take up the bulk of m
+        })
+        .count();
+
+    println!("Day 19 Part 1: {}\nDay 19 Part 2: {}", p1, p2);
     Ok(())
 }
 
@@ -51,10 +59,7 @@ fn simplify(id: &str, rules: &mut HashMap<&str, (String, String)>) -> String {
             result.pop();
             result.push(')');
         }
-
-        let (_, simplification) = rules.get_mut(id).expect("rule disappeared");
-        *simplification = result;
+        rules.get_mut(id).expect("rule disappeared").1 = result;
     }
-
     rules.get(id).expect("no rule simplification").1.clone()
 }
