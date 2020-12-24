@@ -8,8 +8,9 @@ const INPUT: &str = include_str!("../inputs/22.txt");
 fn main() {
     let players: Vec<Deck> = INPUT.splitn(2, "\n\n").map(|s| Deck::from(&s)).collect();
     let p1 = Combat::from(&players).play(false).score();
+    println!("Day 22 Part 1: {}", p1);
     let p2 = Combat::from(&players).play(true).score();
-    println!("\nDay 22 Part 1: {}\nDay 22 Part 2: {}", p1, p2);
+    println!("Day 22 Part 2: {}", p2);
 }
 
 #[derive(Clone)]
