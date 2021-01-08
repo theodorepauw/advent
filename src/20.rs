@@ -51,7 +51,7 @@ fn main() {
 
     for x in 1..144 {
         if x % 12 == 0 {
-            let e = &img[x - 12].rows[9]; // thus try to match right side of anchored tile
+            let e = &img[x - 12].rows[9]; // thus try to match bottom side of anchored tile
             println!("{} {:?}{:?}", x, edges.get(e), edges.get(&rev(e)));
             let id: usize = *edges
                 .get(e)
