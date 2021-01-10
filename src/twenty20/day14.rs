@@ -1,5 +1,5 @@
-const INPUT: &str = include_str!("../inputs/14.txt"); // My solution's very sloppy, but I loved this one!
-
+const INPUT: &str = include_str!("./inputs/14.txt");
+use std::io::{self, Write};
 use std::{collections::HashMap, str::FromStr};
 struct MaskV1 {
     zeros: u64,
@@ -9,7 +9,7 @@ struct MaskV1 {
 #[derive(Clone)]
 struct AddressV2(u64);
 
-fn main() {
+pub fn solve() -> crate::util::Result<()> {
     let (mut memory_v1, mut memory_v2) = (HashMap::new(), HashMap::new());
     let (mut mask_v1, mut mask_v2) = (MaskV1 { zeros: 0, ones: 0 }, "");
 
@@ -19,7 +19,7 @@ fn main() {
 
         match &spec[..4] {
             "mask" => {
-                mask_v1 = val.parse::<MaskV1>().expect("couldn't decode mask");
+                mask_v1 = val.parse::<MaskV1>()?;
                 mask_v2 = val;
             }
             "mem[" => {
@@ -27,9 +27,8 @@ fn main() {
                     .split(']')
                     .next()
                     .expect("invalid mem")
-                    .parse::<u64>()
-                    .unwrap();
-                let val = val.parse::<u64>().unwrap();
+                    .parse::<u64>()?;
+                let val = val.parse::<u64>()?;
                 memory_v1.insert(address_v1, mask_v1.apply(val));
                 AddressV2::generate_all(mask_v2, address_v1)
                     .iter()
@@ -40,16 +39,14 @@ fn main() {
             _ => panic!("Shucks. Unrecognised characters in your puzzle input!"),
         }
     }
+    let (p1, p2): (u64, u64) = (memory_v1.values().sum(), memory_v2.values().sum());
 
-    println!(
-        "Day 14 Part 1: {}\nDay 14 Part 2: {}",
-        memory_v1.values().sum::<u64>(),
-        memory_v2.values().sum::<u64>()
-    );
+    writeln!(io::stdout(), "Day 14 Part 1: {}\nDay 14 Part 2: {}", p1, p2)?;
+    Ok(())
 }
 
 impl FromStr for MaskV1 {
-    type Err = ();
+    type Err = crate::util::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (zeros, ones) = s.chars().fold((0, 0), |(mut z, mut o), c| {
             z <<= 1;
