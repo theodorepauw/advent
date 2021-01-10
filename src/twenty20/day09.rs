@@ -1,38 +1,37 @@
 use std::collections::HashSet;
+use std::io::{self, Write};
 
-const INPUT: &str = include_str!("../inputs/09.txt");
-fn main() {
+const INPUT: &str = include_str!("./inputs/09.txt");
+pub fn solve() -> crate::util::Result<()> {
     let data: Vec<usize> = INPUT
         .lines()
         .map(|s: &str| s.parse::<usize>().expect("Couldn't parse number!"))
         .collect();
 
-    let invalid_number = part1(&data).expect("No answer for Part 1 found");
-    println!("Day 9 Part 1: {}", invalid_number);
-    let encryption_weakness = part2(&data, invalid_number);
-    println!("Day 9 Part 2: {}", encryption_weakness);    
+    let invalid_number = part1(&data).ok_or("No answer for Part 1 found")?;
+    let (p1, p2) = (invalid_number, part2(&data, invalid_number));
+
+    writeln!(io::stdout(), "Day 09 Part 1: {}\nDay 09 Part 2: {}", p1, p2)?;
+    Ok(())
 }
 
 fn part1(data: &[usize]) -> Option<usize> {
-    let mut i = 0;
     let mut sums: Vec<(usize, HashSet<usize>)> = vec![];
-    for d in data {
+    for (i, d) in data.iter().enumerate() {
         if i > 24 && !sums[i - 25..i].iter().any(|(_, s)| s.contains(&d)) {
             return Some(*d);
         }
         sums.push((*d, HashSet::new()));
 
         for j in i..i + 25 {
-            if j >= data.len()-1 {
+            if j >= data.len() - 1 {
                 break;
             }
             if data[i] != data[j] {
                 sums[i].1.insert(data[i] + data[j]);
             }
         }
-
-        i += 1;
-    };
+    }
     None
 }
 
@@ -49,5 +48,6 @@ fn part2(data: &[usize], invalid_number: usize) -> usize {
         }
     }
 
-    data[x1..x2+1].iter().min().expect("no minimum!") + data[x1..x2+1].iter().max().expect("no maximum!")
+    data[x1..x2 + 1].iter().min().expect("no minimum!")
+        + data[x1..x2 + 1].iter().max().expect("no maximum!")
 }
