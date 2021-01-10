@@ -1,9 +1,9 @@
-use std::{collections::HashMap, iter};
-
-const INPUT: &str = include_str!("../inputs/20.txt");
-
+const INPUT: &str = include_str!("./inputs/20.txt");
+use crate::util;
 use lazy_static::lazy_static;
 use regex::Regex;
+use std::io::{self, Write};
+use std::{collections::HashMap, iter};
 
 lazy_static! {
     static ref TOP: Regex = Regex::new(r"..................#.").expect("top err");
@@ -11,13 +11,12 @@ lazy_static! {
     static ref BOT: Regex = Regex::new(r".#..#..#..#..#..#...").expect("bot err");
 }
 
-fn main() {
+pub fn solve() -> util::Result<()> {
     let mut edges: HashMap<String, Vec<usize>> = HashMap::new();
     let mut tiles: HashMap<usize, Tile> = INPUT
         .split("\n\n")
         .map(|s| s.parse::<Tile>().map(|t| (t.id, t)))
-        .collect::<Result<HashMap<_, _>, _>>()
-        .expect("Couldn't parse tiles");
+        .collect::<util::Result<_>>()?;
 
     tiles.values().for_each(|t| {
         t.edges()
@@ -34,7 +33,7 @@ fn main() {
                 .count()
                 == 2
         })
-        .expect("part 2 is whack")
+        .ok_or("part 2 is whack")?
         .id;
     let mut top_left = tiles.remove(&tl_id).expect("no ref tile"); // 1st corner found is made top left.
     while !(edges.get(&top_left.rows[0]).map_or(0, |e| e.len())
@@ -44,7 +43,7 @@ fn main() {
             + edges.get(&rev(&top_left.cols[0])).map_or(0, |e| e.len())
             == 1)
     {
-        println!("{}\n", top_left.rows.join("\n"));
+        writeln!(io::stdout(), "{}\n", top_left.rows.join("\n"))?;
         top_left.turn_left();
     }
     img.push(top_left);
@@ -57,10 +56,9 @@ fn main() {
                 .get(e)
                 .iter()
                 .chain(edges.get(&rev(e)).iter())
-                .flat_map(|v| v.into_iter())
-                .filter(|&&id| id != img[x - 12].id)
-                .next()
-                .expect("no id");
+                .flat_map(|v| v.iter())
+                .find(|&&id| id != img[x - 12].id)
+                .ok_or("no id")?;
 
             let mut next_tile = tiles.remove(&id).expect("no ref tile");
             while &next_tile.rows[0] != e {
@@ -75,19 +73,24 @@ fn main() {
             img.push(next_tile);
         } else {
             let e = &img[x - 1].cols[9]; // thus try to match right side of anchored tile
-            println!("{} {:?}{:?}", x, edges.get(e), edges.get(&rev(e)));
+            writeln!(
+                io::stdout(),
+                "{} {:?}{:?}",
+                x,
+                edges.get(e),
+                edges.get(&rev(e))
+            )?;
             let id: usize = *edges
                 .get(e)
                 .iter()
                 .chain(edges.get(&rev(e)).iter())
-                .flat_map(|v| v.into_iter())
-                .filter(|&&id| id != img[x - 1].id)
-                .next()
-                .expect("no id");
+                .flat_map(|v| v.iter())
+                .find(|&&id| id != img[x - 1].id)
+                .ok_or("no id")?;
 
             let mut next_tile = tiles.remove(&id).expect("no ref tile");
             while &next_tile.cols[0] != e {
-                println!("matching {}", next_tile.id);
+                writeln!(io::stdout(), "matching {}", next_tile.id)?;
                 if &rev(&next_tile.cols[0]) == e {
                     println!("flipping v");
                     next_tile.flip_v()
@@ -103,7 +106,8 @@ fn main() {
     let mut img = Image::from(&img);
     img.rows_and_cols();
     let p2 = img.count_roughness();
-    println!("Day 20 Part 1: {}\nDay 20 Part 2: {}", p1, p2);
+    writeln!(io::stdout(), "Day 20 Part 1: {}\nDay 20 Part 2: {}", p1, p2)?;
+    Ok(())
 }
 
 struct Tile {
@@ -113,7 +117,7 @@ struct Tile {
 }
 
 impl std::str::FromStr for Tile {
-    type Err = Box<dyn std::error::Error>;
+    type Err = util::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut s = s.splitn(2, '\n');
         let id = s
@@ -242,15 +246,13 @@ impl Image {
                 }
             }
             if count == 0 {
-                if i > 0 {
-                    if i % 4 == 0 {
-                        if i % 8 == 0 {
-                            println!("{} flipping v", i);
-                            self.flip_v()
-                        } else {
-                            println!("{} flipping h", i);
-                            self.flip_h()
-                        }
+                if i > 0 && i % 4 == 0 {
+                    if i % 8 == 0 {
+                        println!("{} flipping v", i);
+                        self.flip_v()
+                    } else {
+                        println!("{} flipping h", i);
+                        self.flip_h()
                     }
                 }
                 self.turn_left();
