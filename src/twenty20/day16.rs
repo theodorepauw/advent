@@ -1,6 +1,9 @@
-const INPUT: &str = include_str!("../inputs/16.txt");
-
+const INPUT: &str = include_str!("./inputs/16.txt");
+use crate::util;
+use std::convert::TryFrom;
+use std::io::{self, Write};
 use std::{num::ParseIntError, str::FromStr};
+
 #[derive(Clone)]
 struct Rule {
     title: String,
@@ -12,15 +15,23 @@ struct Ticket {
     fields: Vec<usize>,
     invalid: Option<usize>,
 }
-fn main() {
+pub fn solve() -> util::Result<()> {
     let sections: Vec<&str> = INPUT.split("\n\n").collect();
     let (rules, your_ticket, nearby_tickets) = (
         sections[0],
-        sections[1].strip_prefix("your ticket:\n").unwrap(),
-        sections[2].strip_prefix("nearby tickets:\n").unwrap(),
+        sections[1]
+            .strip_prefix("your ticket:\n")
+            .ok_or("invalid `your ticket` block`")?,
+        sections[2]
+            .strip_prefix("nearby tickets:\n")
+            .ok_or("invalid `nearby tickets` block`")?,
     );
-    let rules: Vec<Rule> = rules.lines().map(|s| Rule::from(s)).collect();
-    let your_ticket: Ticket = your_ticket.parse().expect("couldn't decode your ticket");
+
+    let rules: Vec<Rule> = rules
+        .lines()
+        .map(Rule::try_from)
+        .collect::<util::Result<_>>()?;
+    let your_ticket: Ticket = your_ticket.parse()?;
 
     let (valid, invalid): (Vec<Ticket>, Vec<Ticket>) = nearby_tickets
         .lines()
@@ -32,7 +43,6 @@ fn main() {
         .partition(|t| t.invalid.expect("ticket not checked") == 0);
 
     let p1: usize = invalid.iter().flat_map(|t| t.invalid).sum();
-    println!("Day 16 Part 1: {}", p1);
 
     let mut columns: Vec<usize> = vec![usize::MAX; your_ticket.fields.len()];
     for t in valid {
@@ -40,7 +50,8 @@ fn main() {
             let score: usize = (0..columns.len()).fold(0, |score, i| {
                 score | if rules[i].followed_by(field) { 1 } else { 0 } << i
             });
-            if score != 0 { // i.e. if the ticket is valid
+            if score != 0 {
+                // i.e. if the ticket is valid
                 columns[col] &= score;
             }
         }
@@ -65,7 +76,9 @@ fn main() {
         .filter(|(_, r)| rules[*r].title.starts_with("departure"))
         .map(|(ticket_column, _)| your_ticket.fields[*ticket_column])
         .product();
-    println!("Day 16 Part 2: {}", p2);
+
+    writeln!(io::stdout(), "Day 16 Part 1: {}\nDay 16 Part 2: {}", p1, p2)?;
+    Ok(())
 }
 
 impl FromStr for Ticket {
@@ -80,24 +93,30 @@ impl FromStr for Ticket {
     }
 }
 
-impl Rule {
-    fn from(s: &str) -> Self {
-        let range_from = |s: &str| -> (usize, usize) {
-            let mut s = s.split('-');
-            (
-                s.next().unwrap().parse::<usize>().unwrap(),
-                s.next().unwrap().parse::<usize>().unwrap(),
-            )
+impl TryFrom<&str> for Rule {
+    type Error = util::Error;
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        let range_from = |range: &str| -> Result<(usize, usize), Self::Error> {
+            let mut s = range.split('-');
+            Ok((
+                s.next().ok_or("no range min")?.parse::<usize>()?,
+                s.next().ok_or("no range max")?.parse::<usize>()?,
+            ))
         };
 
         let mut s = s.split(": ");
-        let title: String = s.next().expect("invalid rule").to_owned();
-        let mut s = s.next().expect("ranges not found").split(" or ");
-        let ranges = (range_from(s.next().unwrap()), range_from(s.next().unwrap()));
+        let title: String = s.next().ok_or("no rule title")?.to_owned();
+        let mut s = s.next().ok_or("ranges not found")?.split(" or ");
+        let ranges = (
+            range_from(s.next().ok_or("no 1st range")?)?,
+            range_from(s.next().ok_or("no 2nd range")?)?,
+        );
 
-        Rule { title, ranges }
+        Ok(Rule { title, ranges })
     }
+}
 
+impl Rule {
     fn followed_by(&self, n: usize) -> bool {
         let (r1, r2) = self.ranges;
         (n >= r1.0 && n <= r1.1) || (n >= r2.0 && n <= r2.1)
