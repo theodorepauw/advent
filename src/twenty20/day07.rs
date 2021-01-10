@@ -17,10 +17,7 @@ pub fn solve() -> crate::util::Result<()> {
 
             let mut i = 4;
             while i + 2 < splits.len() {
-                let (qty, color) = (
-                    splits[i].parse::<usize>()?,
-                    splits[i + 1..i + 3].join(""),
-                );
+                let (qty, color) = (splits[i].parse::<usize>()?, splits[i + 1..i + 3].join(""));
                 children.insert(color.clone(), qty);
 
                 bottom_up.entry(color).or_default().insert(upper.clone());
