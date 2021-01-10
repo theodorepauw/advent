@@ -1,9 +1,10 @@
+use crate::util;
 use regex::Regex;
 use std::collections::HashMap;
 
-const INPUT: &str = include_str!("../inputs/19.txt");
+const INPUT: &str = include_str!("./inputs/19.txt");
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+pub fn solve() -> util::Result<()> {
     let mut input = INPUT.splitn(2, "\n\n");
     let mut rules: HashMap<&str, (String, String)> = HashMap::new();
     let (ruleset, messages) = (
@@ -17,7 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         rules.insert(id, (text.replace("\"", ""), String::new()));
     }
 
-    let rule_0 = Regex::new(&format!("^{}$", simplify("0", &mut rules)))?;
+    let rule_0 = Regex::new(&format!("^{}$", simplify("0", &mut rules)?))?;
     let p1 = messages.lines().filter(|m| rule_0.is_match(&m)).count();
     rules.get_mut("0").ok_or("no rule 0")?.1 = String::new();
     let rule_31 = rules.get("31").ok_or("no rule 31")?.1.clone();
@@ -25,7 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     rules.get_mut("8").ok_or("no rule 0")?.1 = format!("{}+", rule_42);
     rules.get_mut("11").ok_or("no rule 0")?.1 = format!("{}+(?P<thirtyone>{}+)", rule_42, rule_31);
 
-    let rule_0 = Regex::new(&format!("^{}$", simplify("0", &mut rules)))?;
+    let rule_0 = Regex::new(&format!("^{}$", simplify("0", &mut rules)?))?;
     let p2 = messages
         .lines()
         .filter(|m| {
@@ -42,9 +43,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn simplify(id: &str, rules: &mut HashMap<&str, (String, String)>) -> String {
-    if rules.get(id).expect("no rule for id").1.len() == 0 {
-        let (text, _) = rules.get(id).expect("no rule for id").clone();
+fn simplify(id: &str, rules: &mut HashMap<&str, (String, String)>) -> util::Result<String> {
+    if rules.get(id).ok_or("no rule for id")?.1.is_empty() {
+        let (text, _) = rules.get(id).ok_or("no rule for id")?.clone();
         let mut result = String::new();
         if text == "a" || text == "b" {
             result.push_str(&text);
@@ -52,14 +53,17 @@ fn simplify(id: &str, rules: &mut HashMap<&str, (String, String)>) -> String {
             result.push('(');
             for x in text.split(" | ") {
                 for t in x.split_whitespace().filter(|&f| f != "a" && f != "b") {
-                    result.push_str(&simplify(t, rules));
+                    result.push_str(&simplify(t, rules)?);
                 }
                 result.push('|');
             }
             result.pop();
             result.push(')');
         }
-        rules.get_mut(id).expect("rule disappeared").1 = result;
+        rules.get_mut(id).ok_or("rule disappeared")?.1 = result;
     }
-    rules.get(id).expect("no rule simplification").1.clone()
+    rules
+        .get(id)
+        .ok_or_else(|| "no rule simplification".into())
+        .map(|r| r.1.clone())
 }
