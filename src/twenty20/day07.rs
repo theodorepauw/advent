@@ -1,7 +1,8 @@
 use std::collections::{HashMap, HashSet};
-const INPUT: &str = include_str!("../inputs/07.txt");
+use std::io::{self, Write};
+const INPUT: &str = include_str!("./inputs/07.txt");
 
-fn main() {
+pub fn solve() -> crate::util::Result<()> {
     let mut bottom_up: HashMap<String, HashSet<String>> = HashMap::new();
     let mut top_down: HashMap<String, HashMap<String, usize>> = HashMap::new();
     let mut bottom_most = vec![];
@@ -11,40 +12,39 @@ fn main() {
         let upper = splits[0..2].join("");
         if &splits[4] == "no" {
             bottom_most.push(upper);
-            continue;
-        }
+        } else {
+            let children = top_down.entry(upper.clone()).or_default();
 
-        let children = top_down.entry(upper.clone()).or_default();
+            let mut i = 4;
+            while i + 2 < splits.len() {
+                let (qty, color) = (
+                    splits[i].parse::<usize>()?,
+                    splits[i + 1..i + 3].join(""),
+                );
+                children.insert(color.clone(), qty);
 
-        let mut i = 4;
-        while i + 2 < splits.len() {
-            let (qty, color) = (
-                splits[i].parse::<usize>().expect("Couldn't grab number"),
-                splits[i + 1..i + 3].join(""),
-            );
-            children.insert(color.clone(), qty);
-
-            let uppers = bottom_up.entry(color).or_default();
-            uppers.insert(upper.clone());
-            i += 4;
+                bottom_up.entry(color).or_default().insert(upper.clone());
+                i += 4;
+            }
         }
     }
 
     let mut ups: Vec<&String> = bottom_up["shinygold"].iter().collect();
     let mut i = 0;
     while let Some(bag) = ups.get(i) {
-        bottom_up.get(*bag).map(|b| {
+        if let Some(b) = bottom_up.get(*bag) {
             ups.extend_from_slice(
                 &b.iter()
                     .filter(|b| !ups.contains(b))
                     .collect::<Vec<&String>>(),
-            )
-        });
+            );
+        }
         i += 1;
     }
 
-    println!("Day 7 Part 1: {}", ups.len());
-    println!("Day 7 Part 2: {}", count_bags("shinygold", &top_down) - 1);
+    let (p1, p2) = (ups.len(), count_bags("shinygold", &top_down) - 1);
+    writeln!(io::stdout(), "Day 07 Part 1: {}\nDay 07 Part 2: {}", p1, p2)?;
+    Ok(())
 }
 
 fn count_bags(color: &str, top_down: &HashMap<String, HashMap<String, usize>>) -> usize {
