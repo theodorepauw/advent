@@ -1,27 +1,11 @@
-const INPUT: usize = include!("../inputs/23.txt"); // -> 784235916
-// const INPUT: usize = 389125467; // Sample Input
+const INPUT: usize = include!("./inputs/23.txt"); // -> 784235916
+use std::io::{self, Write};
 
-fn main() {
-    let digits: Vec<usize> = digits(INPUT).collect();
-    println!("Day 23 Part 1: {}", part_1(&digits));
-    println!("Day 23 Part 2: {}", part_2(&digits));
-}
-
-fn digits(mut n: usize) -> impl Iterator<Item = usize> {
-    let log10 = (0usize.count_zeros() + 1 - n.leading_zeros()) * 1233 >> 12; // base10 log 2 = 0.30102999566 -> approx 1233/4096
-    let mut splitter = 10usize.pow(log10);
-    if n < splitter {
-        splitter /= 10;
-    }
-    std::iter::from_fn(move || match splitter > 0 {
-        true => {
-            let digit = n / splitter;
-            n %= splitter;
-            splitter /= 10;
-            Some(digit)
-        }
-        _ => None,
-    })
+pub fn solve() -> crate::util::Result<()> {
+    let digits: Vec<usize> = crate::util::digits(INPUT).collect();
+    writeln!(io::stdout(), "Day 23 Part 1: {}", part_1(&digits))?;
+    writeln!(io::stdout(), "Day 23 Part 2: {}", part_2(&digits))?;
+    Ok(())
 }
 
 fn play_cups(cups: &[usize], moves: usize) -> Vec<usize> {
@@ -70,9 +54,9 @@ fn part_2(cups: &[usize]) -> usize {
         &(cups
             .iter()
             .map(|x| *x)
-            .chain(max+1..1_000_001usize)
+            .chain(max + 1..1_000_001usize)
             .collect::<Vec<_>>()),
-            10_000_000,
+        10_000_000,
     );
     let cup_2 = links[1];
     let cup_3 = links[cup_2];
