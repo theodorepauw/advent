@@ -127,11 +127,12 @@ pub fn solve() -> util::Result<()> {
     while count == 0 {
         for row in 0..waters_d - MONSTER.len() {
             for col in 0..waters_d - PATTERN[0].len() {
-                if MONSTER.iter().enumerate().all(|(row_offset, spots)| {
+                let is_monster = MONSTER.iter().enumerate().all(|(row_offset, spots)| {
                     spots.iter().all(|&col_offset| {
                         waters[(row + row_offset) * waters_d + col + col_offset] == '#'
                     })
-                }) {
+                });
+                if is_monster {
                     count += 1;
                 }
             }
