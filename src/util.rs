@@ -64,3 +64,20 @@ impl<T: Copy> SquareVec<'_, T> for Vec<T> {
 pub fn sqrt(n: usize) -> usize {
     (n as f64).sqrt() as usize
 }
+
+pub fn digits(mut n: usize) -> impl Iterator<Item = usize> {
+    let log10 = ((0usize.count_zeros() + 1 - n.leading_zeros()) * 1233) >> 12; // base10 log 2 = 0.30102999566 -> approx 1233/4096
+    let mut splitter = 10usize.pow(log10);
+    if n < splitter {
+        splitter /= 10;
+    }
+    std::iter::from_fn(move || match splitter > 0 {
+        true => {
+            let digit = n / splitter;
+            n %= splitter;
+            splitter /= 10;
+            Some(digit)
+        }
+        _ => None,
+    })
+}
