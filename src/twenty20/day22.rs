@@ -1,7 +1,6 @@
 use std::{
     collections::{HashSet, VecDeque},
     io::{self, Write},
-    iter::FromIterator,
 };
 
 const INPUT: &str = include_str!("./inputs/22.txt");
@@ -27,7 +26,11 @@ impl Deck {
     fn from(s: &str) -> Self {
         // Not in the mood for Result shenanigans with FromStr
         Deck {
-            cards: VecDeque::from_iter(s.lines().skip(1).map(|s| s.parse().expect("card err"))),
+            cards: s
+                .lines()
+                .skip(1)
+                .map(|s| s.parse().expect("card err"))
+                .collect(),
             states: HashSet::new(),
             id: None,
         }
@@ -56,7 +59,7 @@ impl Deck {
         let mut cards = self.cards.clone();
         cards.truncate(many);
         Deck {
-            cards: cards,
+            cards,
             states: HashSet::new(),
             id: self.id,
         }
@@ -105,15 +108,13 @@ impl Combat {
                 } else {
                     self.p2.take(c2, c1);
                 }
+            } else if self.recurse(c1, c2) == self.p1.id {
+                self.p1.take(c1, c2);
             } else {
-                if self.recurse(c1, c2) == self.p1.id {
-                    self.p1.take(c1, c2);
-                } else {
-                    self.p2.take(c2, c1);
-                }
+                self.p2.take(c2, c1);
             }
         }
-        if self.p1.cards.len() != 0 {
+        if !self.p1.cards.is_empty() {
             self.p1
         } else {
             self.p2
