@@ -1,8 +1,8 @@
+const INPUT: &str = include_str!("./inputs/21.txt");
 use std::collections::HashMap;
+use std::io::{self, Write};
 
-const INPUT: &str = include_str!("../inputs/21.txt");
-
-fn main() {
+pub fn solve() -> crate::util::Result<()> {
     let mut allergen_names = std::collections::HashSet::new();
     let mut allergens: HashMap<&str, Vec<&str>> = HashMap::new();
     let mut ingredients: HashMap<&str, usize> = HashMap::new();
@@ -48,8 +48,13 @@ fn main() {
         }
     }
     matches.sort_by_key(|(a, _)| *a);
-    let p2 = matches.into_iter().map(|(_, i)| i).collect::<Vec<_>>();
-    let p2 = p2.join(",");
+    let p2 = matches
+        .into_iter()
+        .map(|(_, i)| i)
+        .collect::<Vec<_>>()
+        .join(",");
+
     let p1 = ingredients.values().sum::<usize>();
-    println!("Day 21 Part 1: {}\nDay 21 Part 2: {}", p1, p2);
+    writeln!(io::stdout(), "Day 21 Part 1: {}\nDay 21 Part 2: {}", p1, p2)?;
+    Ok(())
 }
