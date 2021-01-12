@@ -7,8 +7,8 @@ __RECONSTRUCTION OF REPO UNDERWAY__
 
 | Puzzle                                                   | Solution                       |
 |----------------------------------------------------------|--------------------------------|
-| [Day 1: Report Repair](/questions/2020/01.md)            | [here](/src/twenty20/day01.rs) |
-| [Day 2: Password Philosophy](/questions/2020/02.md)      | [here](/src/twenty20/day02.rs) |
+| [Day 1: Report Repair](/questions/2020/01.md)            | [Code](/src/twenty20/day01.rs) |
+| [Day 2: Password Philosophy](/questions/2020/02.md)      | [Code](/src/twenty20/day02.rs) |
 | [Day 3: Toboggan Trajectory](/questions/2020/03.md)      | [Code](/src/twenty20/day03.rs) |
 | [Day 4: Passport Processing](/questions/2020/04.md)      | [Code](/src/twenty20/day04.rs) |
 | [Day 5: Binary Boarding](/questions/2020/05.md)          | [Code](/src/twenty20/day05.rs) |
