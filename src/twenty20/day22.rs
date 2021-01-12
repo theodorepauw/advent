@@ -1,22 +1,25 @@
 use std::{
     collections::{HashSet, VecDeque},
+    io::{self, Write},
     iter::FromIterator,
 };
 
-const INPUT: &str = include_str!("../inputs/22.txt");
+const INPUT: &str = include_str!("./inputs/22.txt");
+type Card = usize;
 
-fn main() {
+pub fn solve() -> crate::util::Result<()> {
     let players: Vec<Deck> = INPUT.splitn(2, "\n\n").map(|s| Deck::from(&s)).collect();
     let p1 = Combat::from(&players).play(false).score();
-    println!("Day 22 Part 1: {}", p1);
+    writeln!(io::stdout(), "Day 22 Part 1: {}", p1)?;
     let p2 = Combat::from(&players).play(true).score();
-    println!("Day 22 Part 2: {}", p2);
+    writeln!(io::stdout(), "Day 22 Part 2: {}", p2,)?;
+    Ok(())
 }
 
 #[derive(Clone)]
 struct Deck {
     id: Option<usize>,
-    cards: VecDeque<usize>,
+    cards: VecDeque<Card>,
     states: HashSet<String>,
 }
 
@@ -36,11 +39,11 @@ impl Deck {
         })
     }
 
-    fn draw(&mut self) -> Option<usize> {
+    fn draw(&mut self) -> Option<Card> {
         self.cards.pop_front()
     }
 
-    fn take(&mut self, winning_card: usize, losing_card: usize) {
+    fn take(&mut self, winning_card: Card, losing_card: Card) {
         self.cards.push_back(winning_card);
         self.cards.push_back(losing_card);
     }
@@ -86,8 +89,7 @@ impl Combat {
 
     fn recurse(&self, p1_many: usize, p2_many: usize) -> Option<usize> {
         let players = [self.p1.copy(p1_many), self.p2.copy(p2_many)];
-        let winner = Combat::from(&players).play(true).id;
-        winner
+        Combat::from(&players).play(true).id
     }
 
     fn play(mut self, recursive: bool) -> Deck {
@@ -95,7 +97,6 @@ impl Combat {
             if recursive && self.p1.seen() && self.p2.seen() {
                 return self.p1;
             }
-
             let (c1, c2) = (self.p1.draw().unwrap(), self.p2.draw().unwrap());
 
             if !recursive || self.p1.cards.len() < c1 || self.p2.cards.len() < c2 {
