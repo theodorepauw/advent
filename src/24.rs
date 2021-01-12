@@ -14,8 +14,7 @@ fn main() {
 fn part1(tiles: &mut HashMap<(i32, i32, i32), bool>) -> usize {
     for line in INPUT.lines() {
         let loc = find_coord(line, CENTRE_TILE);
-        let current = tiles.entry(loc).or_default();
-        *current = !*current;
+        *tiles.entry(loc).or_default() ^= true;
     }
     count_black(&tiles)
 }
@@ -48,8 +47,7 @@ fn part2(tiles: &mut HashMap<(i32, i32, i32), bool>) -> usize {
         }
 
         for coord in flips.into_iter() {
-            let is_black = tiles.get_mut(&coord).expect("tile to flip not stored");
-            *is_black = !*is_black;
+            *tiles.get_mut(&coord).expect("tile to flip not stored") ^= true;
         }
     }
     count_black(tiles)
