@@ -53,7 +53,7 @@ fn part_2(cups: &[usize]) -> usize {
     let links = play_cups(
         &(cups
             .iter()
-            .map(|x| *x)
+            .copied()
             .chain(max + 1..1_000_001usize)
             .collect::<Vec<_>>()),
         10_000_000,
