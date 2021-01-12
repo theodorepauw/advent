@@ -152,12 +152,7 @@ pub fn solve() -> util::Result<()> {
 
     let p2 = waters.iter().filter(|&&c| c == '#').count()
         - (count * MONSTER.iter().map(|p| p.len()).sum::<usize>());
-    writeln!(
-        io::stdout(),
-        "Day 20 Part 1: {}\nDay 20 Part 2: {}",
-        p1,
-        p2,
-    )?;
+    writeln!(io::stdout(), "Day 20 Part 1: {}\nDay 20 Part 2: {}", p1, p2,)?;
     Ok(())
 }
 
