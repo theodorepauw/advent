@@ -40,6 +40,11 @@ fn main() -> util::Result<()> {
                 (2020, 18) => twenty20::day18::solve(),
                 (2020, 19) => twenty20::day19::solve(),
                 (2020, 20) => twenty20::day20::solve(),
+                (2020, 21) => twenty20::day21::solve(),
+                (2020, 22) => twenty20::day22::solve(),
+                (2020, 23) => twenty20::day23::solve(),
+                (2020, 24) => twenty20::day24::solve(),
+                (2020, 25) => twenty20::day25::solve(),
                 _ => {
                     writeln!(
                         io::stdout(),
