@@ -17,8 +17,6 @@ pub trait SquareVec<'a, T> {
 impl<T: Copy> SquareVec<'_, T> for Vec<T> {
     fn rotate_left(&mut self) {
         let d = sqrt(self.len());
-        // use std::io::{self, Write};
-        // writeln!(io::stdout(), "{}", d).unwrap();
         *self = (0..self.len())
             .map(|x| self[d * (x % d) + d - x / d - 1])
             .collect();
@@ -30,8 +28,6 @@ impl<T: Copy> SquareVec<'_, T> for Vec<T> {
 
     fn flip_horizontal(&mut self) {
         let d = sqrt(self.len());
-        // use std::io::{self, Write};
-        // writeln!(io::stdout(), "{}", d).unwrap();
         *self = (0..self.len())
             .map(|x| self[(x / d) * d + d - 1 - (x % d)])
             .collect();
@@ -39,8 +35,6 @@ impl<T: Copy> SquareVec<'_, T> for Vec<T> {
 
     fn flip_vertical(&mut self) {
         let d = sqrt(self.len());
-        // use std::io::{self, Write};
-        // writeln!(io::stdout(), "{}", d).unwrap();
         *self = (0..self.len())
             .map(|x| self[d * (d - 1 - x / d) + x % d])
             .collect()
