@@ -81,3 +81,24 @@ pub fn digits(mut n: usize) -> impl Iterator<Item = usize> {
         _ => None,
     })
 }
+
+pub fn tie_knots(lengths: &[usize], rounds: usize) -> Vec<usize> {
+    const MARKS: usize = 256;
+    let (mut circle, mut curr_pos, mut skip) = ((0..MARKS).collect::<Vec<_>>(), 0, 0);
+    for _ in 0..rounds {
+        for len in lengths {
+            for i in 0..len / 2 {
+                circle.swap((curr_pos + i) % MARKS, (curr_pos + len - 1 - i) % MARKS);
+            }
+            curr_pos += len + skip;
+            skip += 1;
+        }
+    }
+    circle
+}
+
+pub fn knot_hash(sparse_hash: &[usize]) -> u128 {
+    sparse_hash.chunks(16).fold(0, |dense_hash, chunk| {
+        (dense_hash << 8) | chunk.iter().fold(0, |num, d| num ^ d) as u128
+    })
+}
