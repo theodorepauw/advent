@@ -1,5 +1,5 @@
 # Advent of Code 🌠
-Hacky solutions to [Advent of Code 2020](https://adventofcode.com) problems in Rust 🦀
+Hacky solutions to [Advent of Code](https://adventofcode.com) problems in Rust 🦀
 
 # 2020
 
