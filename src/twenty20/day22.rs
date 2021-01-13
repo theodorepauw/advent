@@ -2,15 +2,16 @@ use std::{
     collections::{HashSet, VecDeque},
     io::{self, Write},
 };
-
-const INPUT: &str = include_str!("./inputs/22.txt");
 type Card = usize;
 
+lazy_static::lazy_static! {
+    static ref PLAYERS: Vec<Deck> = include_str!("./inputs/22.txt").splitn(2, "\n\n").map(|s| Deck::from(&s)).collect();
+}
+
 pub fn solve() -> crate::util::Result<()> {
-    let players: Vec<Deck> = INPUT.splitn(2, "\n\n").map(|s| Deck::from(&s)).collect();
-    let p1 = Combat::from(&players).play(false).score();
+    let p1 = Combat::from(&PLAYERS).play(false).score();
     writeln!(io::stdout(), "Day 22 Part 1: {}", p1)?;
-    let p2 = Combat::from(&players).play(true).score();
+    let p2 = Combat::from(&PLAYERS).play(true).score();
     writeln!(io::stdout(), "Day 22 Part 2: {}", p2,)?;
     Ok(())
 }
@@ -19,7 +20,7 @@ pub fn solve() -> crate::util::Result<()> {
 struct Deck {
     id: Option<usize>,
     cards: VecDeque<Card>,
-    states: HashSet<String>,
+    states: HashSet<VecDeque<usize>>,
 }
 
 impl Deck {
@@ -52,7 +53,7 @@ impl Deck {
     }
 
     fn seen(&mut self) -> bool {
-        !self.states.insert(self.to_string())
+        !self.states.insert(self.cards.clone())
     }
 
     fn copy(&self, many: usize) -> Self {
@@ -63,17 +64,6 @@ impl Deck {
             states: HashSet::new(),
             id: self.id,
         }
-    }
-}
-
-impl std::fmt::Display for Deck {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let mut cards = self.cards.iter();
-        write!(fmt, "{}", cards.next().unwrap_or(&0))?;
-        for c in cards {
-            write!(fmt, " {}", c)?;
-        }
-        write!(fmt, "")
     }
 }
 
@@ -91,8 +81,9 @@ impl Combat {
     }
 
     fn recurse(&self, p1_many: usize, p2_many: usize) -> Option<usize> {
-        let players = [self.p1.copy(p1_many), self.p2.copy(p2_many)];
-        Combat::from(&players).play(true).id
+        Combat::from(&[self.p1.copy(p1_many), self.p2.copy(p2_many)])
+            .play(true)
+            .id
     }
 
     fn play(mut self, recursive: bool) -> Deck {
@@ -114,10 +105,10 @@ impl Combat {
                 self.p2.take(c2, c1);
             }
         }
-        if !self.p1.cards.is_empty() {
-            self.p1
-        } else {
-            self.p2
+
+        match self.p1.cards.is_empty() {
+            false => self.p1,
+            _ => self.p2,
         }
     }
 }
