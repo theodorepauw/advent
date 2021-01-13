@@ -111,13 +111,13 @@ pub fn solve() -> util::Result<()> {
             ids.push(curr_id);
         }
     }
-    let p1 = ids[0] * ids[11] * ids[132] * ids[143];
+    let p1 = ids[0] * ids[d - 1] * ids[n_tiles - d] * ids[n_tiles - 1];
     let tile_d = util::sqrt(img[0].len());
     let mut waters = Tile::new(); // assemble all tiles into one big tile
     for block in img.chunks(d) {
-        for r in 1..tile_d - 1 {
+        for row in 1..tile_d - 1 {
             for t in block {
-                let start = r * tile_d;
+                let start = row * tile_d;
                 waters.extend(t[start + 1..start + tile_d - 1].iter());
             }
         }
