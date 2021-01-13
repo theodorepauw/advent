@@ -1,9 +1,5 @@
 use std::convert::TryInto;
 use std::io::{self, Write};
-use std::iter::successors;
-
-// copied from https://github.com/zookini/aoc-2020/blob/master/src/bin/11.rs
-// old version: 8289b31
 
 const DELTAS: [(isize, isize); 8] = [
     (-1, -1),
@@ -15,83 +11,96 @@ const DELTAS: [(isize, isize); 8] = [
     (1, 0),
     (1, 1),
 ];
+const INPUT: &str = include_str!("./inputs/11.txt");
+const CUTOFF: u32 = 10_000;
 
-type Direction = fn(&Grid, (usize, usize), (isize, isize)) -> Option<(usize, usize)>;
-type Grid = Vec<Vec<u8>>;
+lazy_static::lazy_static! {
+    static ref ROWS: usize = INPUT.lines().count();
+    static ref COLS: usize = INPUT.lines().next().unwrap().len();
+}
+
+// this version was mostly copied from fornwall
 
 pub fn solve() -> crate::util::Result<()> {
-    let start = std::time::Instant::now();
-    let grid: Grid = include_str!("./inputs/11.txt")
-        .lines()
-        .map(|line| line.bytes().collect())
-        .collect();
+    let mut data: Vec<u8> = INPUT.lines().flat_map(|s| s.bytes()).collect();
+    let (p1, p2) = (run(&mut data.clone(), 4, true)?, run(&mut data, 5, false)?);
+    writeln!(io::stdout(), "Day 11 Part 1: {}\nDay 11 Part 2: {}", p1, p2)?;
 
-    writeln!(
-        io::stdout(),
-        "Part 1: {}",
-        seated(grid.clone(), 4, |grid, s, n| steps(&grid, s, n).next())
-    )?;
-    writeln!(
-        io::stdout(),
-        "Part 2: {}",
-        seated(grid, 5, |grid, s, n| steps(&grid, s, n)
-            .find(|&(x, y)| grid[y][x] != b'.'))
-    )?;
-    writeln!(io::stdout(), "\n{} μs", start.elapsed().as_micros())?;
     Ok(())
 }
 
-fn seated(start: Grid, threshold: usize, direction: Direction) -> usize {
-    successors(Some(start), |grid| {
-        round(&grid, threshold, direction).filter(|next| next != grid)
-    })
-    .last()
-    .unwrap()
-    .iter()
-    .flat_map(|row| row.iter().filter(|&&b| b == b'#'))
-    .count()
-}
+fn run(data: &mut [u8], threshold: usize, is_part_one: bool) -> crate::util::Result<usize> {
+    let (data_pos_to_seat_idx, seats_counter) =
+        data.iter().enumerate().filter(|(_, &c)| c == b'L').fold(
+            (vec![0; data.len()], 0),
+            |(mut pos_to_seat, seats_counter), (i, _)| {
+                pos_to_seat[i] = seats_counter;
+                (pos_to_seat, seats_counter + 1)
+            },
+        );
 
-fn round(grid: &Grid, threshold: usize, direction: Direction) -> Option<Grid> {
-    Some(
-        grid.iter()
-            .enumerate()
-            .map(|(y, row)| {
-                row.iter()
-                    .enumerate()
-                    .map(|(x, &b)| {
-                        let neighbours = DELTAS
-                            .iter()
-                            .filter_map(|&step| {
-                                direction(grid, (x, y), step).filter(|&(x, y)| grid[y][x] == b'#')
-                            })
-                            .count();
+    // An extra proxy at end for pointing to.
+    let mut seats = vec![false; seats_counter + 1];
 
-                        match b {
-                            b'L' if neighbours == 0 => b'#',
-                            b'#' if neighbours >= threshold => b'L',
-                            _ => b,
-                        }
-                    })
-                    .collect()
+    let mut visibility_map = Vec::with_capacity(seats_counter);
+    for (id, _) in data.iter().enumerate().filter(|(_, &c)| c != b'.') {
+        let (x, y) = (id % *COLS, id / *COLS);
+
+        let mut visibility_entry = [seats_counter; 8];
+        let mut visibility_count = 0;
+        for (dx, dy) in &DELTAS {
+            for (x, y) in std::iter::successors(Some((x, y)), move |&(x, y)| {
+                Some((
+                    (x as isize + dx).try_into().ok()?,
+                    (y as isize + dy).try_into().ok()?,
+                ))
             })
-            .collect(),
-    )
-}
+            .skip(1)
+            .take_while(move |&(x, y)| x < *COLS && y < *ROWS)
+            {
+                let visited_id = x + *COLS * y;
+                if data[visited_id] == b'L' {
+                    visibility_entry[visibility_count] = data_pos_to_seat_idx[visited_id];
+                    visibility_count += 1;
+                    break;
+                }
+                if is_part_one {
+                    break;
+                }
+            }
+        }
 
-fn steps(
-    grid: &Grid,
-    start: (usize, usize),
-    step: (isize, isize),
-) -> impl Iterator<Item = (usize, usize)> {
-    let size = (grid[0].len(), grid.len());
+        visibility_map.push(visibility_entry);
+    }
 
-    successors(Some(start), move |&(x, y)| {
-        Some((
-            (x as isize + step.0).try_into().ok()?,
-            (y as isize + step.1).try_into().ok()?,
-        ))
-    })
-    .skip(1)
-    .take_while(move |&pos| pos.0 < size.0 && pos.1 < size.1)
+    let mut changes: Vec<usize> = Vec::with_capacity(seats_counter);
+    let mut to_visit = (0..seats_counter).collect::<Vec<usize>>();
+    let mut iteration = 0;
+    loop {
+        to_visit.retain(|&idx| {
+            let seen_from_here_count = visibility_map[idx]
+                .iter()
+                .filter(|&&idx| seats[idx as usize])
+                .count();
+
+            // Free seat that is now taken or ccupied seat that is now left:
+            ((!seats[idx] && seen_from_here_count == 0)
+                || (seats[idx] && seen_from_here_count >= threshold))
+                && {
+                    changes.push(idx);
+                    true
+                }
+        });
+
+        changes.drain(0..).for_each(|id| seats[id] ^= true);
+
+        if to_visit.is_empty() {
+            return Ok(seats.iter().filter(|&&occupied| occupied).count());
+        } else {
+            iteration += 1;
+            if iteration >= CUTOFF {
+                return Err(format!("Aborting after {} iterations", iteration).into());
+            }
+        }
+    }
 }
