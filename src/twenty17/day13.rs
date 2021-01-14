@@ -42,7 +42,7 @@ struct Scanner {
 impl Scanner {
     fn with_range(range: usize) -> Self {
         Scanner {
-            range: range,
+            range,
             pos: 0,
             down: true,
         }
