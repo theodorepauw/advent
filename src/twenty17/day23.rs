@@ -2,7 +2,7 @@ const INPUT: &str = include_str!("./inputs/23.txt");
 use std::collections::HashMap;
 use std::io::{self, Write};
 
-pub fn solve() -> crate::util::Result<()>{
+pub fn solve() -> crate::util::Result<()> {
     let instr: Vec<Vec<_>> = INPUT
         .lines()
         .map(|s| s.split_whitespace().take(3).collect())
@@ -15,8 +15,8 @@ pub fn solve() -> crate::util::Result<()>{
     let mut p2 = 0; // p2 == h
     for x in (107900..=124900).step_by(17) {
         let mut n = 2;
-        while n*n <= x {
-            if x%n==0 { 
+        while n * n <= x {
+            if x % n == 0 {
                 p2 += 1;
                 break;
             }
