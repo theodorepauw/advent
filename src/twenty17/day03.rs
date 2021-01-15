@@ -21,7 +21,7 @@ pub fn solve() -> crate::util::Result<()> {
         }
         sum
     };
-    let turn = |facing: usize| -> usize { (facing + 1) % 4 };
+    let turn = |facing: usize| -> usize { (facing + 1) & 3 };
 
     let (mut x, mut y, mut facing) = (0, 0, 0);
     let mut p2 = 0;
