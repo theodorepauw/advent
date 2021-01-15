@@ -1,90 +1,107 @@
 const INPUT: &str = include_str!("./inputs/24.txt");
-use std::io::{self, Write};
 use crate::util;
+use std::cmp::Ordering;
+use std::io::{self, Write};
 
-// My original (slow) version.
+type Route = (usize, Port);
 
 pub fn solve() -> util::Result<()> {
-    let ports: Vec<Port> = INPUT
+    let ports: Vec<Route> = INPUT
         .lines()
-        .map(|s| Port::from_str_tuple(s.split_at(s.find('/').expect("no / sep"))))
-        .collect();
+        .map(str::parse)
+        .enumerate()
+        .map(|(i, res)| res.map(|p| (i, p)))
+        .collect::<util::Result<Vec<Route>>>()?;
 
-    let (tx, rx) = std::sync::mpsc::channel::<Bridge>();
-    std::thread::spawn(move || {
-        Bridge { ports }.build(0, 0, tx);
-    });
-
-    let (p1, (_, p2)) = rx.iter().fold(
+    let (p1, (_, p2)) = Bridge::new().build_on(&ports).fold(
         (0, (0, 0)),
-        |(overall_max, (mut max_len, mut max_for_len)), b| {
-            let (len, strength) = (b.len(), b.strength());
-            if len > max_len {
-                max_len = len;
-                max_for_len = strength;
-            } else if len == max_len {
-                max_for_len = max_for_len.max(strength);
-            }
-            (overall_max.max(strength), (max_len, max_for_len))
+        |(strongest, (longest, strongest_for_length)), b| {
+            (
+                strongest.max(b.strength),
+                match b.length.cmp(&longest) {
+                    Ordering::Greater => (b.length, b.strength),
+                    Ordering::Equal => (b.length, b.strength.max(strongest_for_length)),
+                    Ordering::Less => (longest, strongest_for_length),
+                },
+            )
         },
     );
+
     writeln!(io::stdout(), "Day 24 Part 1: {}\nDay 24 Part 2: {}", p1, p2)?;
     Ok(())
 }
 
-#[derive(Clone)]
 struct Port {
     front: usize,
     back: usize,
     weight: usize,
 }
 
-impl Port {
-    fn from_str_tuple((s1, s2): (&str, &str)) -> Self {
-        let front = s1.parse::<usize>().unwrap();
-        let back = s2[1..].parse::<usize>().unwrap();
-        Port {
+impl std::str::FromStr for Port {
+    type Err = util::Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (s1, s2) = s.split_at(s.find('/').expect("no / sep"));
+        let (front, back) = (s1.parse::<usize>()?, s2[1..].parse::<usize>()?);
+        let weight = front + back;
+        Ok(Port {
             front,
             back,
-            weight: front + back,
-        }
-    }
-
-    fn rev(&mut self) {
-        let temp = self.front;
-        self.front = self.back;
-        self.back = temp;
+            weight,
+        })
     }
 }
 
+#[derive(Clone)]
 struct Bridge {
-    ports: Vec<Port>,
+    next_pins: usize,
+    length: usize,
+    strength: usize,
+    used: u64, // replacement for HashSet because input only contains 57 entries
 }
 
 impl Bridge {
-    fn len(&self) -> usize {
-        self.ports.len()
+    fn new() -> Self {
+        Bridge {
+            next_pins: 0,
+            length: 0,
+            strength: 0,
+            used: 0,
+        }
     }
 
-    fn strength(&self) -> usize {
-        self.ports.iter().map(|p| p.weight).sum()
-    }
+    fn build_on<'a>(mut self, ports: &'a [Route]) -> Box<dyn Iterator<Item = Self> + 'a> {
+        let (single, double): (Vec<_>, Vec<_>) = ports
+            .iter()
+            .filter(|(i, p)| {
+                (self.used >> i) & 1 == 0 && (p.front == self.next_pins || p.back == self.next_pins)
+            })
+            .partition(|(_, p)| p.front != p.back);
 
-    fn build(mut self, cursor: usize, pins: usize, tx: std::sync::mpsc::Sender<Self>) {
-        if cursor < self.ports.len() {
-            for i in cursor..self.ports.len() {
-                if self.ports[i].front == pins || {
-                    self.ports[i].rev();
-                    self.ports[i].front == pins
-                } {
-                    let mut next_bridge = self.ports.clone();
-                    next_bridge.swap(cursor, i);
-                    let pins = next_bridge[cursor].back;
-                    Bridge { ports: next_bridge }.build(cursor + 1, pins, tx.clone());
-                }
-            }
-            self.ports.truncate(cursor);
-            tx.send(self).expect("send failure")
+        for (i, _) in double {
+            // eagerly advance entries like 23/23 to prevent excessive branching
+            self.used |= 1 << i;
+            self.strength += self.next_pins << 1;
+            self.length += 1;
+        }
+
+        if single.is_empty() {
+            Box::new(std::iter::once(self)) as Box<dyn Iterator<Item = Bridge> + 'a>
+        } else {
+            Box::new(
+                single
+                    .into_iter()
+                    .map(move |(i, p)| Bridge {
+                        next_pins: if self.next_pins == p.front {
+                            p.back
+                        } else {
+                            p.front
+                        },
+                        strength: self.strength + p.weight,
+                        length: self.length + 1,
+                        used: (self.used | (1 << i)),
+                    })
+                    .flat_map(move |b| b.build_on(ports)),
+            )
         }
     }
 }
