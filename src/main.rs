@@ -1,3 +1,4 @@
+mod twenty17;
 mod twenty20;
 mod util;
 use std::io::{self, Write};
@@ -16,10 +17,36 @@ fn main() -> util::Result<()> {
             }
         })??;
 
+    let start = std::time::Instant::now();
     let solution_handles: Vec<std::thread::JoinHandle<util::Result<()>>> = args
         .filter_map(|a| a.parse::<u8>().ok())
         .map(|day| {
             std::thread::spawn(move || match (year, &day) {
+                (2017, 1) => twenty17::day01::solve(),
+                (2017, 2) => twenty17::day02::solve(),
+                (2017, 3) => twenty17::day03::solve(),
+                (2017, 4) => twenty17::day04::solve(),
+                (2017, 5) => twenty17::day05::solve(),
+                (2017, 6) => twenty17::day06::solve(),
+                (2017, 7) => twenty17::day07::solve(),
+                (2017, 8) => twenty17::day08::solve(),
+                (2017, 9) => twenty17::day09::solve(),
+                (2017, 10) => twenty17::day10::solve(),
+                (2017, 11) => twenty17::day11::solve(),
+                (2017, 12) => twenty17::day12::solve(),
+                (2017, 13) => twenty17::day13::solve(),
+                (2017, 14) => twenty17::day14::solve(),
+                (2017, 15) => twenty17::day15::solve(),
+                (2017, 16) => twenty17::day16::solve(),
+                (2017, 17) => twenty17::day17::solve(),
+                (2017, 18) => twenty17::day18::solve(),
+                (2017, 19) => twenty17::day19::solve(),
+                (2017, 20) => twenty17::day20::solve(),
+                (2017, 21) => twenty17::day21::solve(),
+                (2017, 22) => twenty17::day22::solve(),
+                (2017, 23) => twenty17::day23::solve(),
+                (2017, 24) => twenty17::day24::solve(),
+                (2017, 25) => twenty17::day25::solve(),
                 (2020, 1) => twenty20::day01::solve(),
                 (2020, 2) => twenty20::day02::solve(),
                 (2020, 3) => twenty20::day03::solve(),
@@ -63,5 +90,11 @@ fn main() -> util::Result<()> {
             writeln!(io::stdout(), "{:?}", e)?;
         }
     }
+
+    writeln!(
+        io::stdout(),
+        "Finished in {} ms",
+        start.elapsed().as_millis()
+    )?;
     Ok(())
 }
