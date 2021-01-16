@@ -2,10 +2,10 @@
 Solutions to [Advent of Code](https://adventofcode.com) problems in Rust 🦀
 
 So far, I've completed:
-- [X] Year 2020
+- [x] Year 2020
 - [ ] Year 2019
 - [ ] Year 2018
-- [X] Year 2017
+- [x] Year 2017
 - [ ] Year 2016
 - [ ] Year 2015
 
