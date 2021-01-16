@@ -34,7 +34,7 @@ pub fn solve() -> util::Result<()> {
 struct Port {
     front: usize,
     back: usize,
-    weight: usize,
+    strength: usize,
 }
 
 impl std::str::FromStr for Port {
@@ -42,11 +42,11 @@ impl std::str::FromStr for Port {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (s1, s2) = s.split_at(s.find('/').expect("no / sep"));
         let (front, back) = (s1.parse::<usize>()?, s2[1..].parse::<usize>()?);
-        let weight = front + back;
+        let strength = front + back;
         Ok(Port {
             front,
             back,
-            weight,
+            strength,
         })
     }
 }
@@ -96,7 +96,7 @@ impl Bridge {
                         } else {
                             p.front
                         },
-                        strength: self.strength + p.weight,
+                        strength: self.strength + p.strength,
                         length: self.length + 1,
                         used: (self.used | (1 << i)),
                     })
