@@ -1,8 +1,8 @@
 const INPUT: &str = include_str!("./inputs/25.txt");
+use crate::util;
 use std::convert::TryFrom;
 use std::io::{self, Write};
 use std::iter::once;
-use crate::util;
 
 pub fn solve() -> util::Result<()> {
     let info: Vec<Vec<&str>> = INPUT.split("\n\n").map(|s| s.lines().collect()).collect();
