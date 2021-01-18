@@ -49,7 +49,7 @@ pub fn solve() -> crate::util::Result<()> {
         .map(|(id, (min, _))| id.parse::<usize>().ok().map(|id| id * min))
         .flatten()
         .ok_or("no sol p2")?;
-        
+
     writeln!(io::stdout(), "Day 04 Part 1: {}\nDay 04 Part 2: {}", p1, p2)?;
     Ok(())
 }
