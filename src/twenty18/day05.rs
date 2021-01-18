@@ -4,7 +4,7 @@ use crate::util::Result;
 use std::io::{self, Write};
 
 pub fn solve() -> Result<()> {
-    let react = |polymers: &[u8]| -> Result<usize> {
+    let react = |polymers: &[u8]| -> Result<Vec<bool>> {
         let mut active = vec![true; polymers.len()];
         let mut i = 0;
         while let Some(j) = active[i + 1..]
@@ -40,19 +40,22 @@ pub fn solve() -> Result<()> {
                 break;
             }
         }
-        Ok(active.iter().filter(|&&is_active| is_active).count())
+        Ok(active)
     };
 
-    let p1 = react(INPUT)?;
+    let reduced_len = |active: &[bool]| active.iter().filter(|&&is_active| is_active).count();
+    let still_active: Vec<bool> = react(INPUT)?;
+    let p1 = reduced_len(&still_active);
     let p2 = (b'a'..=b'z')
         .map(|unit| {
-            INPUT
-                .iter()
-                .filter(|&&x| !(x == unit || x == (unit - CAP_DIFF)))
-                .cloned()
-                .collect::<Vec<u8>>()
+            (0..INPUT.len())
+                .filter(|&i| still_active[i])
+                .map(|i| INPUT[i])
+                .filter(|&x| !(x == unit || x == unit - CAP_DIFF))
+                .collect::<Vec<_>>()
         })
         .filter_map(|p| react(&p).ok())
+        .map(|active| reduced_len(&active))
         .min_by_key(|&len| len)
         .ok_or("no min polymer length")?;
 
