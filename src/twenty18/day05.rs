@@ -4,43 +4,57 @@ use crate::util::Result;
 use std::io::{self, Write};
 
 pub fn solve() -> Result<()> {
-    let polymers = INPUT.to_vec();
-
-    let react = move |mut polymers: Vec<u8>| -> Result<usize> {
+    let react = |polymers: &[u8]| -> Result<usize> {
+        let mut active = vec![true; polymers.len()];
         let mut i = 0;
-        loop {
-            let j = i + 1;
-            if j >= polymers.len() {
-                break;
-            }
-
-            let diff = polymers[i]
-                .checked_sub(polymers[j])
-                .or_else(|| polymers[j].checked_sub(polymers[i]))
-                .ok_or("couldn't calc diff")?;
+        while let Some(j) = active[i + 1..]
+            .iter()
+            .position(|&is_active| is_active)
+            .map(|x| i + 1 + x)
+        {
+            let diff = if polymers[i] > polymers[j] {
+                polymers[i] - polymers[j]
+            } else {
+                polymers[j] - polymers[i]
+            };
 
             if diff == CAP_DIFF {
-                polymers.drain(i..=j);
-                i = i.saturating_sub(1);
+                active[i] = false;
+                active[j] = false;
+
+                if let Some(prev_active) = active[0..i].iter().rposition(|&is_active| is_active) {
+                    i = prev_active;
+                } else if let Some(fwd_offset) = if j + 1 < active.len() {
+                    active[j + 1..].iter().position(|&is_active| is_active)
+                } else {
+                    None
+                } {
+                    i += fwd_offset
+                } else {
+                    break;
+                }
             } else {
                 i = j;
             }
+            if i == active.len() - 1 {
+                break;
+            }
         }
-        Ok(polymers.len())
+        Ok(active.iter().filter(|&&is_active| is_active).count())
     };
 
+    let p1 = react(INPUT)?;
     let p2 = (b'a'..=b'z')
         .map(|unit| {
-            polymers
+            INPUT
                 .iter()
                 .filter(|&&x| !(x == unit || x == (unit - CAP_DIFF)))
                 .cloned()
-                .collect()
+                .collect::<Vec<u8>>()
         })
-        .filter_map(|p| react(p).ok())
+        .filter_map(|p| react(&p).ok())
         .min_by_key(|&len| len)
         .ok_or("no min polymer length")?;
-    let p1 = react(polymers)?;
 
     writeln!(io::stdout(), "Day 05 Part 1: {}\nDay 05 Part 2: {}", p1, p2)?;
     Ok(())
