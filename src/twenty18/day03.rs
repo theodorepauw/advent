@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::{self, Write};
 
 pub fn solve() -> crate::util::Result<()> {
-    let mut fabric = HashMap::new();
+    let mut fabric: HashMap<(usize, usize), Vec<&str>> = HashMap::new();
     let mut ids = HashSet::new();
     for s in INPUT.lines() {
         let parts: Vec<_> = s.split_whitespace().collect();
@@ -19,7 +19,7 @@ pub fn solve() -> crate::util::Result<()> {
 
         for x in offsets[0]..offsets[0] + dimensions[0] {
             for y in offsets[1]..offsets[1] + dimensions[1] {
-                fabric.entry((x, y)).or_insert(vec![]).push(id);
+                fabric.entry((x, y)).or_default().push(id);
             }
         }
         ids.insert(id);
@@ -28,13 +28,13 @@ pub fn solve() -> crate::util::Result<()> {
     let p1 = fabric
         .values()
         .filter(|f| f.len() > 1)
-        .map(|f| {
+        .fold(0, |overlaps, f| {
             for id in f {
                 ids.remove(id);
             }
-            f
-        })
-        .count();
+            overlaps + 1
+        });
+
     let p2 = ids.iter().next().ok_or("no sol p2")?;
     writeln!(io::stdout(), "Day 03 Part 1: {}\nDay 03 Part 2: {}", p1, p2)?;
 
