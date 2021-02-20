@@ -54,10 +54,8 @@ pub fn solve() -> crate::util::Result<()> {
             if let Some(id) = id {
                 if x == min_x || x == max_x || y == min_y || y == max_y {
                     counts.remove(&id);
-                } else {
-                    if let Some(count) = counts.get_mut(&id) {
-                        *count += 1;
-                    }
+                } else if let Some(count) = counts.get_mut(&id) {
+                    *count += 1;
                 }
             }
 
