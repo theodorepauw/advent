@@ -5,7 +5,6 @@ const DX: &[i32] = &[0, 1, 0, -1]; // up -> right -> down -> left
 const DY: &[i32] = &[1, 0, -1, 0]; // up -> right -> down -> left
 
 pub fn solve() -> crate::util::Result<()> {
-    let start = std::time::Instant::now();
     let (mut infected_p1, mut infected_p2): (HashMap<(i32, i32), bool>, HashMap<(i32, i32), u8>) =
         (HashMap::new(), HashMap::new());
     let (mut x_p1, mut y_p1) = INPUT.chars().fold((0, 0), |(mut x, mut y), c| {
@@ -70,10 +69,9 @@ pub fn solve() -> crate::util::Result<()> {
 
     writeln!(
         io::stdout(),
-        "Day 22 Part 1: {}\nDay 22 Part 2: {}\n\n{} us",
+        "Day 22 Part 1: {}\nDay 22 Part 2: {}\n\n",
         p1,
         p2,
-        start.elapsed().as_micros()
     )?;
     Ok(())
 }
