@@ -2,12 +2,12 @@
 Solutions to [Advent of Code](https://adventofcode.com) problems in Rust 🦀
 
 So far, I've completed:
-- [x] [Year 2020](/src/twenty20)
-- [ ] [Year 2019 (WIP)](/src/twenty19)
-- [ ] [Year 2018 (WIP)](/src/twenty18)
-- [x] [Year 2017](/src/twenty17)
-- [ ] Year 2016
-- [ ] Year 2015
+- [x] [2020](/src/twenty20)
+- [ ] [2019 (WIP)](/src/twenty19)
+- [ ] [2018 (WIP)](/src/twenty18)
+- [x] [2017](/src/twenty17)
+- [ ] 2016
+- [ ] 2015
 
 # 2020
 
