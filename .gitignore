@@ -1,2 +1,6 @@
 /target
 src/twenty20/inputs/test.txt
+.DS_Store
+.idea/advent.iml
+.idea/modules.xml
+.idea/vcs.xml

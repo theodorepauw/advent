@@ -2,6 +2,7 @@ mod twenty17;
 mod twenty18;
 mod twenty19;
 mod twenty20;
+mod twenty21;
 mod util;
 use std::io::{self, Write};
 
@@ -12,7 +13,7 @@ fn main() -> util::Result<()> {
         .ok_or("Specify a year!")?
         .parse::<u16>()
         .map(|y| {
-            if y > 2014 && y < 2021 {
+            if y > 2014 && y < 2022 {
                 Ok(y)
             } else {
                 Err("Year must be a number 2015-2020")
@@ -124,6 +125,31 @@ fn main() -> util::Result<()> {
                 (2020, 23) => twenty20::day23::solve(),
                 (2020, 24) => twenty20::day24::solve(),
                 (2020, 25) => twenty20::day25::solve(),
+                (2021, 1) => twenty21::day01::solve(),
+                // (2020, 2) => twenty20::day02::solve(),
+                // (2020, 3) => twenty20::day03::solve(),
+                // (2020, 4) => twenty20::day04::solve(),
+                // (2020, 5) => twenty20::day05::solve(),
+                // (2020, 6) => twenty20::day06::solve(),
+                // (2020, 7) => twenty20::day07::solve(),
+                // (2020, 8) => twenty20::day08::solve(),
+                // (2020, 9) => twenty20::day09::solve(),
+                // (2020, 10) => twenty20::day10::solve(),
+                // (2020, 11) => twenty20::day11::solve(),
+                // (2020, 12) => twenty20::day12::solve(),
+                // (2020, 13) => twenty20::day13::solve(),
+                // (2020, 14) => twenty20::day14::solve(),
+                // (2020, 15) => twenty20::day15::solve(),
+                // (2020, 16) => twenty20::day16::solve(),
+                // (2020, 17) => twenty20::day17::solve(),
+                // (2020, 18) => twenty20::day18::solve(),
+                // (2020, 19) => twenty20::day19::solve(),
+                // (2020, 20) => twenty20::day20::solve(),
+                // (2020, 21) => twenty20::day21::solve(),
+                // (2020, 22) => twenty20::day22::solve(),
+                // (2020, 23) => twenty20::day23::solve(),
+                // (2020, 24) => twenty20::day24::solve(),
+                // (2020, 25) => twenty20::day25::solve(),
                 _ => {
                     writeln!(
                         io::stdout(),
