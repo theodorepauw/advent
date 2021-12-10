@@ -38,6 +38,6 @@ pub fn solve() -> crate::util::Result<()> {
 
     let p2 = oxygen_generator_rating[0] * co2_scrubber_rating[0];
 
-    writeln!(io::stdout(), "Day 01 Part 1: {}\nDay 01 Part 2: {}", p1, p2)?;
+    writeln!(io::stdout(), "Day 03 Part 1: {}\nDay 03 Part 2: {}", p1, p2)?;
     Ok(())
 }
