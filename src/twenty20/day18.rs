@@ -51,7 +51,7 @@ fn solve_v1(s: &str) -> crate::util::Result<u64> {
                 ('*', _) => (result, '*'),
                 (_, '+') => (result + s.parse::<u64>()?, operator),
                 (_, '*') => (result * s.parse::<u64>()?, operator),
-                _ => panic!(format!("unrecognised str: {}!", s)),
+                _ => panic!("unrecognised str: {}!", s),
             })
         })?
         .0)

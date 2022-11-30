@@ -134,7 +134,7 @@ impl Program {
             "add" => self.add(reg, val),
             "mul" => self.mul(reg, val),
             "mod" => self.rem(reg, val),
-            _ => panic!(format!("{} is invalid", cmd)),
+            _ => panic!("{} is invalid", cmd),
         }
     }
 

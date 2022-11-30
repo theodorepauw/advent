@@ -63,7 +63,7 @@ impl Program {
             "set" => self.set(reg, val),
             "sub" => self.sub(reg, val),
             "mul" => self.mul(reg, val),
-            _ => panic!(format!("{} is invalid", cmd)),
+            _ => panic!("{} is invalid", cmd),
         }
     }
 
