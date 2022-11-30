@@ -47,6 +47,6 @@ pub fn solve() -> crate::util::Result<()> {
     scores.sort_unstable();
     let p2 = scores.get(scores.len() >> 1).unwrap();
 
-    writeln!(io::stdout(), "Day 01 Part 1: {}\nDay 01 Part 2: {}", p1, p2)?;
+    writeln!(io::stdout(), "Day 10 Part 1: {}\nDay 10 Part 2: {}", p1, p2)?;
     Ok(())
 }
