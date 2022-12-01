@@ -9,7 +9,7 @@ pub fn solve() -> crate::util::Result<()> {
     for line in INPUT.lines() {
         let s: Vec<&str> = line.splitn(4, char::is_whitespace).collect();
         let name = s[0];
-        let weight = (&s[1][1..s[1].len() - 1]).to_owned().parse::<i32>()?;
+        let weight = (s[1][1..s[1].len() - 1]).to_owned().parse::<i32>()?;
         bottom.insert(name.to_owned());
         weights.insert(name, weight);
         if let Some(s) = s.get(3) {

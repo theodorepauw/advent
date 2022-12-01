@@ -9,10 +9,11 @@ pub fn solve() -> crate::util::Result<()> {
     let height_valid = |height: &str| -> bool {
         let unit = &height[height.len() - 2..];
         let h = &height[..height.len() - 2];
-        (unit == "cm" && h >= "150" && h <= "193") || (unit == "in" && h >= "59" && h <= "76")
+        (unit == "cm" && ("150"..="193").contains(&h))
+            || (unit == "in" && ("59"..="76").contains(&h))
     };
     let eye_colors = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
-    let hair_color_valid = |code: &str| matches!(code.strip_prefix("#"), Some(clr) if clr.len() == 6 && i64::from_str_radix(clr, 16).is_ok());
+    let hair_color_valid = |code: &str| matches!(code.strip_prefix('#'), Some(clr) if clr.len() == 6 && i64::from_str_radix(clr, 16).is_ok());
 
     let (p1, p2) = INPUT.split("\n\n").fold((0, 0), |(p1, p2), creds| {
         let (a, b) = creds
@@ -29,15 +30,12 @@ pub fn solve() -> crate::util::Result<()> {
                 _ => (false, false),
             })
             .fold((0, 0), |(p1_valid, p2_valid), (a, b)| {
-                (
-                    p1_valid + if a { 1 } else { 0 },
-                    p2_valid + if b { 1 } else { 0 },
-                )
+                (p1_valid + usize::from(a), p2_valid + usize::from(b))
             });
 
         (
-            p1 + if a == REQ_FIELDS.len() { 1 } else { 0 },
-            p2 + if b == REQ_FIELDS.len() { 1 } else { 0 },
+            p1 + i32::from(a == REQ_FIELDS.len()),
+            p2 + i32::from(b == REQ_FIELDS.len()),
         )
     });
 

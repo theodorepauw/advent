@@ -48,7 +48,7 @@ pub fn solve() -> crate::util::Result<()> {
             flashes += 1;
             for (dy, dx) in YX_STEPS.iter() {
                 let (adj_y, adj_x) = (y as i8 + dy, x as i8 + dx);
-                if (adj_y >= 0 && adj_y < 10) && (adj_x >= 0 && adj_x < 10) {
+                if (0..10).contains(&adj_y) && (0..10).contains(&adj_x) {
                     let (adj_y, adj_x) = (adj_y as usize, adj_x as usize);
                     let octopus = &mut rows[adj_y][adj_x];
                     if let Some(energy) = *octopus {

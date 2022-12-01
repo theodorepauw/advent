@@ -48,7 +48,7 @@ fn count_bags(color: &str, top_down: &HashMap<String, HashMap<String, usize>>) -
     let contents = if let Some(children) = top_down.get(color) {
         children
             .iter()
-            .map(|(c, qty)| qty * count_bags(c, &top_down))
+            .map(|(c, qty)| qty * count_bags(c, top_down))
             .sum()
     } else {
         0

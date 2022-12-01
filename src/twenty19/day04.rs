@@ -7,7 +7,7 @@ pub fn solve() -> Result<()> {
     let p1 = (MIN..=MAX)
         .filter_map(|pwd| {
             digits(pwd).try_fold((0, 0), |(adjacent, prev), d| {
-                (d >= prev).then(|| (if d == prev { adjacent + 1 } else { adjacent }, d))
+                (d >= prev).then_some((if d == prev { adjacent + 1 } else { adjacent }, d))
             })
         })
         .filter(|(adj, _)| *adj > 0)

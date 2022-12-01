@@ -15,11 +15,11 @@ pub fn solve() -> util::Result<()> {
         let mut split = r.splitn(2, ": ");
         let id = split.next().ok_or("no : in rule")?;
         let text = split.next().ok_or("no text after :")?;
-        rules.insert(id, (text.replace("\"", ""), String::new()));
+        rules.insert(id, (text.replace('\"', ""), String::new()));
     }
 
     let rule_0 = Regex::new(&format!("^{}$", simplify("0", &mut rules)?))?;
-    let p1 = messages.lines().filter(|m| rule_0.is_match(&m)).count();
+    let p1 = messages.lines().filter(|m| rule_0.is_match(m)).count();
     rules.get_mut("0").ok_or("no rule 0")?.1 = String::new();
     let rule_31 = rules.get("31").ok_or("no rule 31")?.1.clone();
     let rule_42 = rules.get("42").ok_or("no rule 42")?.1.clone();
@@ -31,7 +31,7 @@ pub fn solve() -> util::Result<()> {
         .lines()
         .filter(|m| {
             rule_0
-                .captures(&m)
+                .captures(m)
                 .and_then(|c| c.name("thirtyone"))
                 .map_or(0, |x| x.start())
                 << 1

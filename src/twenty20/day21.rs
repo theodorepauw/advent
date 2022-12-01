@@ -9,7 +9,7 @@ pub fn solve() -> crate::util::Result<()> {
     for l in INPUT.lines() {
         let s: Vec<&str> = l[..l.len() - 1].splitn(2, '(').collect();
         let ings: Vec<&str> = s
-            .get(0)
+            .first()
             .expect("no ingredients")
             .split_whitespace()
             .collect();
@@ -38,7 +38,7 @@ pub fn solve() -> crate::util::Result<()> {
         for a in allergen_names.iter() {
             let ings = allergens.get::<str>(a).expect("no ings for a");
             if ings.len() == 1 {
-                let i = ings.get(0).expect("no ing at 0").to_string();
+                let i = ings.first().expect("no ing at 0").to_string();
                 ingredients.remove::<str>(&i);
                 for (_, ings) in allergens.iter_mut() {
                     ings.retain(|that_ing| that_ing != &i);

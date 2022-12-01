@@ -18,6 +18,7 @@ lazy_static::lazy_static! {
 type Edge = String;
 type Tile = Vec<char>;
 type Image = Vec<Tile>;
+type ChainOfEdges = Chain<Chain<Chain<Once<Edge>, Once<Edge>>, Once<Edge>>, Once<Edge>>;
 
 pub fn solve() -> util::Result<()> {
     let mut edges: HashMap<Edge, Vec<usize>> = HashMap::new();
@@ -45,7 +46,7 @@ pub fn solve() -> util::Result<()> {
     let count_parents =
         |ids: Option<&Vec<usize>>| -> usize { ids.map(|ids| ids.len()).unwrap_or(0) };
     let is_shared = |e: &Edge, map: &HashMap<Edge, Vec<usize>>| -> bool {
-        count_parents(map.get(e)) + count_parents(map.get(&rev(&e))) == 2
+        count_parents(map.get(e)) + count_parents(map.get(&rev(e))) == 2
     };
 
     let corner_id = tiles
@@ -171,7 +172,7 @@ trait Square<'a>: SquareVec<'a, char> {
         self.right_edge().collect()
     }
 
-    fn edges(&self) -> Chain<Chain<Chain<Once<Edge>, Once<Edge>>, Once<Edge>>, Once<Edge>> {
+    fn edges(&self) -> ChainOfEdges {
         once(self.top())
             .chain(once(self.left()))
             .chain(once(self.bot()))

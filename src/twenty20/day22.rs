@@ -5,7 +5,7 @@ use std::{
 type Card = usize;
 
 lazy_static::lazy_static! {
-    static ref PLAYERS: Vec<Deck> = include_str!("./inputs/22.txt").splitn(2, "\n\n").map(|s| Deck::from(&s)).collect();
+    static ref PLAYERS: Vec<Deck> = include_str!("./inputs/22.txt").splitn(2, "\n\n").map(Deck::from).collect();
 }
 
 pub fn solve() -> crate::util::Result<()> {

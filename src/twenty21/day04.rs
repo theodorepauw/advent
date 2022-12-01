@@ -2,7 +2,7 @@ const INPUT: &str = include_str!("./inputs/04.txt");
 use std::io::{self, Write};
 
 pub fn solve() -> crate::util::Result<()> {
-    let str_to_int = |s| usize::from_str_radix(s, 10).expect("err: str to usize");
+    let str_to_int = |s: &str| s.parse::<usize>().expect("err: str to usize");
     let mut paragraphs = INPUT.split_terminator("\n\n");
     let order = paragraphs
         .next()

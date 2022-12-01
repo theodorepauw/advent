@@ -46,8 +46,7 @@ pub fn solve() -> crate::util::Result<()> {
         .into_iter()
         .flat_map(|(k, v)| std::iter::repeat(k).zip(v.into_iter()))
         .max_by_key(|(_, (_, v))| *v)
-        .map(|(id, (min, _))| id.parse::<usize>().ok().map(|id| id * min))
-        .flatten()
+        .and_then(|(id, (min, _))| id.parse::<usize>().ok().map(|id| id * min))
         .ok_or("no sol p2")?;
 
     writeln!(io::stdout(), "Day 04 Part 1: {}\nDay 04 Part 2: {}", p1, p2)?;
