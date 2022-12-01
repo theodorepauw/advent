@@ -14,7 +14,6 @@ const YX_STEPS: &[(i8, i8)] = &[
 ];
 
 pub fn solve() -> crate::util::Result<()> {
-    // writeln!(io::stdout(), "Day 01 Part 1: {}\nDay 01 Part 2: {}", p1, p2)?;
     let mut rows: Vec<Vec<Option<u8>>> = INPUT
         .lines()
         .map(|s| s.chars().map(|c| c.to_digit(10).map(|x| x as u8)).collect())
@@ -31,9 +30,9 @@ pub fn solve() -> crate::util::Result<()> {
             p1 = flashes;
         }
 
-        for y in 0..10 {
-            for x in 0..10 {
-                rows[y][x] = match rows[y][x] {
+        for (y, row) in rows.iter_mut().enumerate() {
+            for (x, octopus) in row.iter_mut().enumerate() {
+                *octopus = match *octopus {
                     Some(9) => {
                         flash_queue.push_back((y, x));
                         None
