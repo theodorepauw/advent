@@ -24,7 +24,7 @@ pub fn solve() -> crate::util::Result<()> {
 
     let p2 = (0..seat_ids.len() - 1)
         .map(|i| (seat_ids[i], seat_ids[i + 1]))
-        .find_map(|(curr, next)| (next - curr > 1).then(|| curr + 1))
+        .find_map(|(curr, next)| (next - curr > 1).then_some(curr + 1))
         .ok_or("no sol for p2")?;
 
     writeln!(io::stdout(), "Day 05 Part 1: {}\nDay 05 Part 2: {}", p1, p2)?;

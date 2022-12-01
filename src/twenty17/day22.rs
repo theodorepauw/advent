@@ -3,9 +3,10 @@ use std::io::{self, Write};
 const INPUT: &str = include_str!("./inputs/22.txt");
 const DX: &[i32] = &[0, 1, 0, -1]; // up -> right -> down -> left
 const DY: &[i32] = &[1, 0, -1, 0]; // up -> right -> down -> left
+type Coord = (i32, i32);
 
 pub fn solve() -> crate::util::Result<()> {
-    let (mut infected_p1, mut infected_p2): (HashMap<(i32, i32), bool>, HashMap<(i32, i32), u8>) =
+    let (mut infected_p1, mut infected_p2): (HashMap<Coord, bool>, HashMap<Coord, u8>) =
         (HashMap::new(), HashMap::new());
     let (mut x_p1, mut y_p1) = INPUT.chars().fold((0, 0), |(mut x, mut y), c| {
         match c {

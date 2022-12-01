@@ -8,7 +8,7 @@ pub fn solve() -> crate::util::Result<()> {
 
     let p1 = INPUT
         .lines()
-        .flat_map(|s| s.rsplitn(2, " | ").next().unwrap().split_whitespace())
+        .flat_map(|s| s.rsplit(" | ").next().unwrap().split_whitespace())
         .filter(|&s| matches!(s.len(), 2 | 3 | 4 | 7))
         .count();
 

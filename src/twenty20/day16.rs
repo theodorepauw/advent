@@ -48,7 +48,7 @@ pub fn solve() -> util::Result<()> {
     for t in valid {
         for (col, &field) in t.fields.iter().enumerate() {
             let score: usize = (0..columns.len()).fold(0, |score, i| {
-                score | if rules[i].followed_by(field) { 1 } else { 0 } << i
+                score | usize::from(rules[i].followed_by(field)) << i
             });
             if score != 0 {
                 // i.e. if the ticket is valid

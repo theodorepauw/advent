@@ -48,9 +48,7 @@ pub fn solve() -> crate::util::Result<()> {
             height.map_or(false, |h| {
                 DELTAS
                     .iter()
-                    .filter_map(|&(c, r)| {
-                        get_index(i, c, r, width).map_or(None, |j| heightmap.get(j))
-                    })
+                    .filter_map(|&(c, r)| get_index(i, c, r, width).and_then(|j| heightmap.get(j)))
                     .all(|neighbour_height| neighbour_height.map_or(true, |nh| h < nh))
             })
         })

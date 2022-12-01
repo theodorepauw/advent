@@ -37,10 +37,10 @@ fn group(s: &str, v: &Version) -> util::Result<u64> {
             result.push((stack.pop().expect(") unmatched"), i));
         }
     }
-    let (start, end) = result.get(0).expect("no op");
+    let (start, end) = result.first().expect("no op");
     let expression = format!("{}", group(&s[start + 1..*end], v)?);
     let simplified = &[&s[..*start], &expression, &s[end + 1..]].join("");
-    group(&simplified, v)
+    group(simplified, v)
 }
 
 fn solve_v1(s: &str) -> crate::util::Result<u64> {
@@ -59,6 +59,6 @@ fn solve_v1(s: &str) -> crate::util::Result<u64> {
 
 fn solve_v2(s: &str) -> crate::util::Result<u64> {
     s.split('*')
-        .map(|expr| solve_v1(expr))
+        .map(solve_v1)
         .try_fold(1, |product, sol| sol.map(|x| x * product))
 }

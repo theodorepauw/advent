@@ -18,8 +18,7 @@ pub fn solve() -> util::Result<()> {
         .into_iter()
         .skip(1)
         .map(|v| (Rule::try_from(&v[2..5]), Rule::try_from(&v[6..9])))
-        .map(|(r1, r2)| once(r1).chain(once(r2)))
-        .flatten()
+        .flat_map(|(r1, r2)| once(r1).chain(once(r2)))
         .collect::<Result<_, _>>()?;
 
     let mut machine = TuringMachine {
@@ -46,7 +45,7 @@ struct TuringMachine {
 impl TuringMachine {
     fn tick(&mut self, rules: &[Rule]) {
         let val = self.tape.get_mut(self.cursor).expect("cursor OOB");
-        let r = &rules[self.state << 1 | if *val { 1 } else { 0 }];
+        let r = &rules[self.state << 1 | usize::from(*val)];
         *val = r.write;
         self.cursor = match r.shift {
             Shift::Left => self.cursor - 1,

@@ -13,11 +13,7 @@ pub fn solve() -> crate::util::Result<()> {
 
     let most_common_bit = |list: &[usize], power: usize| {
         let ones: usize = list.iter().map(|&n| (n >> power) & 1).sum();
-        if ones + 1 > (list.len() + 1 >> 1) {
-            1
-        } else {
-            0usize
-        }
+        usize::from(ones + 1 > (list.len() + 1) >> 1)
     };
 
     let (gamma, epsilon) = (0..binary_length).rev().fold((0, 0), |(g, e), i| {
@@ -28,7 +24,7 @@ pub fn solve() -> crate::util::Result<()> {
     let p1 = gamma * epsilon;
 
     let mut oxygen_generator_rating = numbers.clone();
-    let mut co2_scrubber_rating = numbers.clone();
+    let mut co2_scrubber_rating = numbers;
     let mut power = binary_length;
 
     while oxygen_generator_rating.len() > 1 {

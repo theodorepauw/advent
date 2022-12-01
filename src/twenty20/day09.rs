@@ -18,7 +18,7 @@ pub fn solve() -> crate::util::Result<()> {
 fn part1(data: &[usize]) -> Option<usize> {
     let mut sums: Vec<(usize, HashSet<usize>)> = vec![];
     for (i, d) in data.iter().enumerate() {
-        if i > 24 && !sums[i - 25..i].iter().any(|(_, s)| s.contains(&d)) {
+        if i > 24 && !sums[i - 25..i].iter().any(|(_, s)| s.contains(d)) {
             return Some(*d);
         }
         sums.push((*d, HashSet::new()));
