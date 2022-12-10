@@ -154,7 +154,7 @@ fn main() -> util::Result<()> {
                 (2022, 1) => twenty22::day01::solve(),
                 (2022, 2) => twenty22::day02::solve(),
                 (2022, 3) => twenty22::day03::solve(),
-                // (2022, 4) => twenty22::day04::solve(),
+                (2022, 4) => twenty22::day04::solve(),
                 // (2022, 5) => twenty22::day05::solve(),
                 // (2022, 6) => twenty22::day06::solve(),
                 // (2022, 7) => twenty22::day07::solve(),
